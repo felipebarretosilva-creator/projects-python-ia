@@ -1,12 +1,20 @@
 import cv2
 
-def recorder(cap, frame):
-    # Recording
-    cap_weight = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    cap_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    fps = 20.0
 
-    #Define codec (FourCC) and VideoWriter
-    fourcc = cv2.VideoWriter.fourcc(*"MJPG")  # Use 'MP4V' or 'MJPG'
-    out = cv2.VideoWriter('video_gravado.avi', fourcc, fps, (cap_weight, cap_height))
-    out.write(frame)
+class Recorder:
+
+    def __init__(self, output_path, fps, frame_size):
+
+        fourcc = cv2.VideoWriter_fourcc(*"MJPG")
+        self.writer = cv2.VideoWriter(
+            output_path,
+            fourcc,
+            fps,
+            frame_size
+        )
+
+    def write(self, frame):
+        self.writer.write(frame)
+
+    def release(self):
+        self.writer.release()

@@ -8,12 +8,10 @@ from core.drag_rect import DragRect
 from core.render import Renderer
 from utils.geometry import landmark_distance
 from core.physics import PhysicsEngine
-from utils.recorder import recorder
+from utils.recorder import Recorder
 
 
 def main():
-
-    cap = cv2.VideoCapture(CAMERA_INDEX)
 
     tracker = HandTracker(MODEL_PATH, NUM_HANDS)
     renderer = Renderer(ALPHA_OVERLAY)
@@ -24,6 +22,21 @@ def main():
     ]
 
     physics = PhysicsEngine()
+
+    cap = cv2.VideoCapture(CAMERA_INDEX)
+    fps = cap.get(cv2.CAP_PROP_FPS)
+
+    if fps == 0:
+        fps = FPS_OUTPUT  # fallback do config
+
+    frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+    recorder = Recorder(
+        "output.avi",
+        fps,
+        (frame_width, frame_height)
+    )
 
     while True:
 
@@ -61,7 +74,7 @@ def main():
 
         cv2.imshow("Hand Interaction", frame)
 
-        recorder(cap, frame)
+        recorder.write(frame)
 
         key = cv2.waitKey(1)
 
@@ -77,6 +90,7 @@ def main():
         if key==27:
             break
 
+    recorder.release()
     tracker.close()
     cap.release()
     cv2.destroyAllWindows()
